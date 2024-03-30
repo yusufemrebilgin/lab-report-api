@@ -1,20 +1,12 @@
 package com.example.labreportapi.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @Entity
 @Table(name = "patient")
-public class Patient {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
+public class Patient extends BaseEntity {
 
     @Column(name = "first_name")
     private String firstName;
@@ -35,14 +27,6 @@ public class Patient {
     public Patient(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getFirstName() {

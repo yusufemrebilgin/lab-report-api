@@ -7,12 +7,7 @@ import java.sql.Date;
 
 @Entity
 @Table(name = "report_detail")
-public class ReportDetail {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
+public class ReportDetail extends BaseEntity {
 
     @Column(name = "diagnosis_details")
     private String diagnosisDetails;
@@ -35,14 +30,6 @@ public class ReportDetail {
         this.diagnosisDetails = diagnosisDetails;
         this.reportDate = reportDate;
         this.reportPhoto = reportPhoto;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getDiagnosisDetails() {

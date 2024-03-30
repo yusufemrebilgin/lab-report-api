@@ -1,18 +1,12 @@
 package com.example.labreportapi.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
 
 @Entity
 @Table(name = "lab_technician")
-public class LabTechnician {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
+public class LabTechnician extends BaseEntity {
 
     @Column(name = "first_name")
     private String firstName;
@@ -33,14 +27,6 @@ public class LabTechnician {
         this.firstName = firstName;
         this.lastName = lastName;
         this.hospitalId = hospitalId;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getFirstName() {

@@ -2,16 +2,9 @@ package com.example.labreportapi.entity;
 
 import jakarta.persistence.*;
 
-import java.math.BigInteger;
-
 @Entity
 @Table(name = "patient_detail")
-public class PatientDetail {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
+public class PatientDetail extends BaseEntity {
 
     @Column(name = "tr_identity_number")
     private long identityNumber;
@@ -32,14 +25,6 @@ public class PatientDetail {
         this.identityNumber = identityNumber;
         this.email = email;
         this.phoneNumber = phoneNumber;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public long getIdentityNumber() {
