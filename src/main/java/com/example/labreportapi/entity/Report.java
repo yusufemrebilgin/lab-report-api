@@ -1,8 +1,16 @@
 package com.example.labreportapi.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+@Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Table(name = "report")
 public class Report extends BaseEntity {
 
@@ -26,53 +34,4 @@ public class Report extends BaseEntity {
     @JoinColumn(name = "report_detail_id")
     private ReportDetail reportDetail;
 
-    public Report() {}
-
-    public Report(String reportCode, String diagnosisTitle) {
-        this.reportCode = reportCode;
-        this.diagnosisTitle = diagnosisTitle;
-    }
-
-    public String getReportCode() {
-        return reportCode;
-    }
-
-    public void setReportCode(String reportCode) {
-        this.reportCode = reportCode;
-    }
-
-    public String getDiagnosisTitle() {
-        return diagnosisTitle;
-    }
-
-    public void setDiagnosisTitle(String diagnosisTitle) {
-        this.diagnosisTitle = diagnosisTitle;
-    }
-
-    public Patient getPatient() {
-        return patient;
-    }
-
-    public void setPatient(Patient patient) {
-        this.patient = patient;
-    }
-
-    public LabTechnician getLabTechnician() {
-        return labTechnician;
-    }
-
-    public void setLabTechnician(LabTechnician labTechnician) {
-        this.labTechnician = labTechnician;
-    }
-
-    public ReportDetail getReportDetail() {
-        return reportDetail;
-    }
-
-    public void setReportDetail(ReportDetail reportDetail) {
-        this.reportDetail = reportDetail;
-        if (reportDetail != null) {
-            reportDetail.setReport(this);
-        }
-    }
 }

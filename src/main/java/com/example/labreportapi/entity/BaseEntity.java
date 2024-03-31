@@ -1,7 +1,9 @@
 package com.example.labreportapi.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @MappedSuperclass
 public class BaseEntity {
 
@@ -10,11 +12,4 @@ public class BaseEntity {
     @Column(name = "id")
     private int id;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 }

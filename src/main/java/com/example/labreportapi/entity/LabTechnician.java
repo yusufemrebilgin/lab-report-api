@@ -1,10 +1,18 @@
 package com.example.labreportapi.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Table(name = "lab_technician")
 public class LabTechnician extends BaseEntity {
 
@@ -21,43 +29,4 @@ public class LabTechnician extends BaseEntity {
             CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Report> reports;
 
-    public LabTechnician() {}
-
-    public LabTechnician(String firstName, String lastName, int hospitalId) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.hospitalId = hospitalId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public int getHospitalId() {
-        return hospitalId;
-    }
-
-    public void setHospitalId(int hospitalId) {
-        this.hospitalId = hospitalId;
-    }
-
-    public List<Report> getReports() {
-        return reports;
-    }
-
-    public void setReports(List<Report> reports) {
-        this.reports = reports;
-    }
 }
