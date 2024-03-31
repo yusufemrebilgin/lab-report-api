@@ -1,6 +1,7 @@
 package com.example.labreportapi.response;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public class ApiResponse<T> {
 
@@ -8,10 +9,18 @@ public class ApiResponse<T> {
     private String message;
     private T data;
 
-    public ApiResponse(HttpStatus status, String message, T data) {
+    private ApiResponse(HttpStatus status, String message, T data) {
         this.status = status;
         this.message = message;
         this.data = data;
+    }
+
+    public static <T> ResponseEntity<ApiResponse<T>> build(HttpStatus status, String message) {
+        return build(status, message, null);
+    }
+
+    public static <T> ResponseEntity<ApiResponse<T>> build(HttpStatus status, String message, T data) {
+        return ResponseEntity.status(status).body(new ApiResponse<>(status, message, data));
     }
 
     public HttpStatus getStatus() {
