@@ -24,43 +24,36 @@ public class ReportRestController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<Report>>> getAllReports() {
-        ApiResponse<List<Report>> apiResponse = reportService.findAll();
-        return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+        return reportService.findAll();
     }
 
     @GetMapping("/asc")
     public ResponseEntity<ApiResponse<List<Report>>> getAllReportsByOrderByReportDateAsc() {
-        ApiResponse<List<Report>> apiResponse = reportService.findAllByOrderByReportDateAsc();
-        return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+        return reportService.findAllByOrderByReportDateAsc();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Report>> getReportById(@PathVariable int id) {
         try {
-            ApiResponse<Report> apiResponse = reportService.findById(id);
-            return ResponseEntity.ok(apiResponse);
+            return reportService.findById(id);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(HttpStatus.NOT_FOUND, e.getMessage(), null));
+            return ApiResponse.build(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<Report>> addReport(@RequestBody Report report) {
-        ApiResponse<Report> apiResponse = reportService.add(report);
-        return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+        return reportService.add(report);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Report>> updateReport(@RequestBody Report report, @PathVariable int id) {
-        ApiResponse<Report> apiResponse = reportService.update(report, id);
-        return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+        return reportService.update(report, id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Report>> deleteReportById(@PathVariable int id) {
-        ApiResponse<Report> apiResponse = reportService.delete(id);
-        return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+    public ResponseEntity<ApiResponse<Void>> deleteReportById(@PathVariable int id) {
+        return reportService.delete(id);
     }
 
 }

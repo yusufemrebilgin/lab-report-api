@@ -20,8 +20,8 @@ public class ReportImageRestController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getReportImage(@PathVariable("reportId") int reportId) {
-        byte[] imageData = reportImageService.getImageDataByReportId(reportId);
+    public ResponseEntity<?> getReportImage(@PathVariable("reportId") int id) {
+        byte[] imageData = reportImageService.getImageDataByReportId(id);
         if (imageData != null) {
             return ResponseEntity.ok(imageData);
         }
@@ -29,17 +29,13 @@ public class ReportImageRestController {
     }
 
     @PostMapping
-    public ResponseEntity<?> uploadReportImage(@RequestParam("image")MultipartFile file,
-                                               @PathVariable("reportId") int reportId) {
-
-        ApiResponse<ReportImage> apiResponse = reportImageService.uploadImage(file, reportId);
-        return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+    public ResponseEntity<?> uploadReportImage(@RequestParam("image")MultipartFile file, @PathVariable("reportId") int id) {
+        return reportImageService.uploadImage(file, id);
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteReportImage(@PathVariable("reportId") int reportId) {
-        ApiResponse<?> apiResponse = reportImageService.deleteImage(reportId);
-        return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+    public ResponseEntity<?> deleteReportImage(@PathVariable("reportId") int id) {
+        return reportImageService.deleteImage(id);
     }
 
 }

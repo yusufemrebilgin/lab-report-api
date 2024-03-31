@@ -24,30 +24,25 @@ public class ReportDetailRestController {
     @GetMapping
     public ResponseEntity<ApiResponse<ReportDetail>> getReportDetailById(@PathVariable("reportId") int id) {
         try {
-            ApiResponse<ReportDetail> apiResponse = reportDetailService.findById(id);
-            return ResponseEntity.ok(apiResponse);
+            return reportDetailService.findById(id);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(HttpStatus.NOT_FOUND, e.getMessage(), null));
+            return ApiResponse.build(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ReportDetail>> addReportDetail(@PathVariable("reportId") int id, @RequestBody ReportDetail detail) {
-        ApiResponse<ReportDetail> apiResponse = reportDetailService.add(detail);
-        return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+    public ResponseEntity<ApiResponse<ReportDetail>> addReportDetail(@RequestBody ReportDetail detail, @PathVariable("reportId") int id) {
+        return reportDetailService.add(detail, id);
     }
 
     @PutMapping
-    public ResponseEntity<ApiResponse<ReportDetail>> updateReportDetail(@PathVariable("reportId") int id, @RequestBody ReportDetail detail) {
-        ApiResponse<ReportDetail> apiResponse = reportDetailService.update(detail, id);
-        return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+    public ResponseEntity<ApiResponse<ReportDetail>> updateReportDetail(@RequestBody ReportDetail detail, @PathVariable("reportId") int id) {
+        return reportDetailService.update(detail, id);
     }
 
     @DeleteMapping
     public ResponseEntity<ApiResponse<ReportDetail>> deleteReportDetail(@PathVariable("reportId") int id) {
-        ApiResponse<ReportDetail> apiResponse = reportDetailService.delete(id);
-        return ResponseEntity.status(apiResponse.getStatus()).body(apiResponse);
+        return reportDetailService.delete(id);
     }
 
 }
