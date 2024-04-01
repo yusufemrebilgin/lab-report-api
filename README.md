@@ -40,7 +40,7 @@ It provides endpoints for managing lab reports.
 7.  Once the app is running, you can test the API using tools like **Postman**. Here are **_some endpoints_** and their usage:
 
     | HTTP Method | Endpoint            | Description                                                |
-        | ----------- | ------------------- | ---------------------------------------------------------- |
+    | ----------- | ------------------- | ---------------------------------------------------------- |
     | GET         | /api/reports        | Retrieve all reports                                       |
     | GET         | /api/reports/asc    | Retrieve all reports in ascending order by report date     |
     | GET         | /api/reports/{id}   | Retrieve a specific report by its ID                       |
@@ -137,7 +137,7 @@ It provides endpoints for managing lab reports.
 | PUT         | /api/patients/{id}            | Update an existing patient                                 |
 | DELETE      | /api/patients/{id}            | Delete a specific patient by its ID                        |
 
-## PatientDetail
+### PatientDetail
 
 | HTTP Method | Endpoint                  | Description                                      |
 | ----------- | ------------------------- | ------------------------------------------------ |
@@ -146,7 +146,7 @@ It provides endpoints for managing lab reports.
 | PUT         | /api/patients/{patientId} | Update an existing patient detail                |
 | DELETE      | /api/patients/{patientId} | Delete a specific patient detail by patient ID   |
 
-## LabTechnician
+### LabTechnician
 
 | HTTP Method | Endpoint                     | Description                                                   |
 | ----------- | ---------------------------- | ------------------------------------------------------------- |
