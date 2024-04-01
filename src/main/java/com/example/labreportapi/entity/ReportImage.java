@@ -22,10 +22,9 @@ public class ReportImage extends BaseEntity {
     private byte[] imageData;
 
     @JsonIgnore
-    @OneToOne(
-            mappedBy = "reportImage",
-            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
-            fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "reportImage",
+              cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+              fetch = FetchType.LAZY)
     private ReportDetail reportDetail;
 
 }

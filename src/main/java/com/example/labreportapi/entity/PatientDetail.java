@@ -1,5 +1,6 @@
 package com.example.labreportapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class PatientDetail extends BaseEntity {
 
     @OneToOne(mappedBy = "patientDetail", cascade = {CascadeType.DETACH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.REFRESH})
+    @JsonIgnore
     private Patient patient;
 
 }

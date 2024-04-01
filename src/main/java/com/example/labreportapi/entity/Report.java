@@ -1,5 +1,7 @@
 package com.example.labreportapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,11 +25,13 @@ public class Report extends BaseEntity {
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "patient_id")
+    @JsonManagedReference
     private Patient patient;
 
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "lab_technician_id")
+    @JsonBackReference
     private LabTechnician labTechnician;
 
     @OneToOne(cascade = CascadeType.ALL)

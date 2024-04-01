@@ -24,9 +24,10 @@ public class ReportDetail extends BaseEntity {
     @JoinColumn(name = "report_image_id")
     private ReportImage reportImage;
 
-    @OneToOne(mappedBy = "reportDetail", cascade = {CascadeType.DETACH, CascadeType.MERGE,
-            CascadeType.PERSIST, CascadeType.REFRESH})
     @JsonIgnore
+    @OneToOne(mappedBy = "reportDetail",
+              cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+              fetch = FetchType.LAZY)
     private Report report;
 
 }
