@@ -1,7 +1,5 @@
 # Lab Report REST API
 
----
-
 This project is a REST API built using Java Spring Boot, Maven, Spring Data JPA and MySQL.
 It provides endpoints for managing lab reports.
 
@@ -11,9 +9,9 @@ It provides endpoints for managing lab reports.
 
 2.  Open a terminal or command prompt and **navigate to the root directory** of the project.
 
-3.  Import the SQL script located in the `sql-script` folder to set up database schema and sample data.
+3.  **Import the SQL script** located in the `sql-script` folder to set up database schema and sample data.
 
-4.  Configure MySQL database settings in `src/main/resources/application.properties`. Replace the url, username and
+4.  **Configure MySQL database settings** in `src/main/resources/application.properties`. Replace the url, username and
     password properties with your MySQL configuration.
 
 5.  After configuring database, **use the Maven Wrapper to compile the project** and download dependencies. Use the following commands to compile the project:
@@ -50,7 +48,7 @@ It provides endpoints for managing lab reports.
     | GET         | /api/patients/asc   | Retrieve all patients in ascending order by full names     |
     | GET         | /api/patient/search | Search for patients by first name and last name parameters |
 
-    - Sample GET request - `localhost:7070/api/reports/3`
+    - Sample **GET** request - `localhost:7070/api/reports/3`
     - Response with HTTP status 200:
 
     ```json
@@ -77,15 +75,14 @@ It provides endpoints for managing lab reports.
       }
     }
     ```
+    
     - [Click here for more endpoints](#endpoints)
 
 ## ERD
 
 <p align = "center">
-    <img src="">
+    <img src="https://github.com/yusufemrebilgin/lab-report-api/blob/main/images/erd.png">
 </p>
-
----
 
 ## Endpoints
 
@@ -96,7 +93,7 @@ It provides endpoints for managing lab reports.
 - [PatientDetail](#patientdetail)
 - [LabTechnician](#labtechnician)
 
-### Report Endpoints
+### Report
 
 | HTTP Method | Endpoint          | Description                                            |
 | ----------- | ----------------- | ------------------------------------------------------ |
