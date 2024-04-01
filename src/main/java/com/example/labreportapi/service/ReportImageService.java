@@ -5,7 +5,6 @@ import com.example.labreportapi.dao.ReportRepository;
 import com.example.labreportapi.entity.Report;
 import com.example.labreportapi.entity.ReportDetail;
 import com.example.labreportapi.entity.ReportImage;
-import com.example.labreportapi.response.ApiResponse;
 import com.example.labreportapi.util.ImageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class ReportImageService {
         this.reportRepository = reportRepository;
     }
 
-    public ResponseEntity<ApiResponse<ReportImage>> uploadImage(MultipartFile file, int reportId) {
+    public ResponseEntity<?> uploadImage(MultipartFile file, int reportId) {
         try {
             ReportImage uploadedImage = ReportImage.builder()
                     .name(file.getOriginalFilename())
@@ -49,13 +48,13 @@ public class ReportImageService {
                 reportDetail.setReportImage(uploadedImage);
                 report.setReportDetail(reportDetail);
                 reportImageRepository.save(uploadedImage);
-                return ApiResponse.build(HttpStatus.OK, "Image uploaded successfully", uploadedImage);
+                return ResponseEntity.ok(uploadedImage);
             } else {
-                return ApiResponse.build(HttpStatus.NOT_FOUND, "There is no report for id: " + reportId);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There is no image for report: " + reportId);
             }
         } catch (IOException e) {
             log.error("Failed to upload image", e);
-            return ApiResponse.build(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload image");
+            return ResponseEntity.internalServerError().body("Failed to upload image");
         }
     }
 
@@ -71,15 +70,15 @@ public class ReportImageService {
         return null;
     }
 
-    public ResponseEntity<ApiResponse<Void>> deleteImage(int reportId) {
+    public ResponseEntity<String> deleteImage(int reportId) {
         Optional<ReportImage> optionalReportImage = reportImageRepository.findByReportDetailReportId(reportId);
         if (optionalReportImage.isPresent()) {
             ReportImage existingImage = optionalReportImage.get();
             existingImage.getReportDetail().setReportImage(null);
             reportImageRepository.delete(existingImage);
-            return ApiResponse.build(HttpStatus.OK, "Report image deleted successfully");
+            return ResponseEntity.ok("Report image deleted successfully");
         } else {
-            return ApiResponse.build(HttpStatus.NOT_FOUND, "Report image not found with id: " + reportId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Report image not found with id: " + reportId);
         }
     }
 

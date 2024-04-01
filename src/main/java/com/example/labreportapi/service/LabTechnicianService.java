@@ -3,7 +3,6 @@ package com.example.labreportapi.service;
 import com.example.labreportapi.dao.LabTechnicianRepository;
 import com.example.labreportapi.entity.LabTechnician;
 import com.example.labreportapi.entity.Report;
-import com.example.labreportapi.response.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,26 +22,46 @@ public class LabTechnicianService {
         this.labTechnicianRepository = labTechnicianRepository;
     }
 
-    public ResponseEntity<ApiResponse<List<LabTechnician>>> findAll() {
+    public ResponseEntity<List<LabTechnician>> findAll() {
         List<LabTechnician> labTechnicians = labTechnicianRepository.findAll();
         if (labTechnicians.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ApiResponse.build(HttpStatus.OK, "The lab tech(s) found successfully", labTechnicians);
+        return ResponseEntity.ok(labTechnicians);
     }
 
-    public ResponseEntity<ApiResponse<LabTechnician>> findById(int id) {
+    public ResponseEntity<LabTechnician> findById(int id) {
         Optional<LabTechnician> optionalLabTechnician = labTechnicianRepository.findById(id);
         if (optionalLabTechnician.isPresent()) {
             LabTechnician labTechnician = optionalLabTechnician.get();
-            return ApiResponse.build(HttpStatus.OK, "Lab technician found successfully", labTechnician);
+            return ResponseEntity.ok(labTechnician);
         } else {
             throw new EntityNotFoundException("Lab technician not found with id: " + id);
         }
     }
-    public ResponseEntity<ApiResponse<LabTechnician>> add(LabTechnician labTechnician) {
+
+    public ResponseEntity<?> findByFirstNameAndLastName(String firstName, String lastName) {
+        Optional<LabTechnician> optionalTechnician = labTechnicianRepository
+                .findByFirstNameIgnoreCaseAndLastNameIgnoreCase(firstName, lastName);
+
+        if (optionalTechnician.isPresent()) {
+            LabTechnician labTech = optionalTechnician.get();
+            return ResponseEntity.ok(labTech);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lab tech not found: " + firstName + " " + lastName);
+    }
+
+    public ResponseEntity<?> findByHospitalId(int hospitalId) {
+        LabTechnician labTechnician = labTechnicianRepository.findByHospitalId(hospitalId);
+        if (labTechnician == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lab tech not found");
+        }
+        return ResponseEntity.ok(labTechnician);
+    }
+
+    public ResponseEntity<?> add(LabTechnician labTechnician) {
         if (labTechnician == null || labTechnician.getHospitalId() == 0) {
-            return ApiResponse.build(HttpStatus.BAD_REQUEST, "Lab technician or id cannot be empty");
+            return ResponseEntity.badRequest().body("Lab technician or id cannot be empty");
         }
 
         List<Report> reports = labTechnician.getReports();
@@ -51,12 +70,12 @@ public class LabTechnicianService {
         }
 
         labTechnicianRepository.save(labTechnician);
-        return ApiResponse.build(HttpStatus.CREATED, "The lab technician successfully created", labTechnician);
+        return ResponseEntity.status(HttpStatus.CREATED).body(labTechnician);
     }
 
-    public ResponseEntity<ApiResponse<LabTechnician>> update(LabTechnician updatedTechnician, int id) {
+    public ResponseEntity<?> update(LabTechnician updatedTechnician, int id) {
         if (updatedTechnician == null) {
-            return ApiResponse.build(HttpStatus.BAD_REQUEST, "Lab technician cannot be null");
+            return ResponseEntity.badRequest().body("Lab technician cannot be null");
         }
 
         Optional<LabTechnician> optionalTechnician = labTechnicianRepository.findById(id);
@@ -71,13 +90,13 @@ public class LabTechnicianService {
             }
 
             updatedTechnician = labTechnicianRepository.save(existingTechnician);
-            return ApiResponse.build(HttpStatus.OK, "Lab technician updated with id: " + id, updatedTechnician);
+            return ResponseEntity.ok(updatedTechnician);
         } else {
-            return ApiResponse.build(HttpStatus.NOT_FOUND, "Lab technician not found with id: " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lab technician not found with id: " + id);
         }
     }
 
-    public ResponseEntity<ApiResponse<Void>> delete(int id) {
+    public ResponseEntity<String> delete(int id) {
         Optional<LabTechnician> optionalTechnician = labTechnicianRepository.findById(id);
         if (optionalTechnician.isPresent()) {
             LabTechnician existingTechnician = optionalTechnician.get();
@@ -88,9 +107,9 @@ public class LabTechnicianService {
             }
 
             labTechnicianRepository.delete(existingTechnician);
-            return ApiResponse.build(HttpStatus.OK, "Lab technician with id " + id + " deleted successfully");
+            return ResponseEntity.ok("Lab technician with id " + id + " deleted successfully");
         }
-        return ApiResponse.build(HttpStatus.NOT_FOUND, "Lab technician not found with id: " + id);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lab tech not found with id: " + id);
     }
 
 }

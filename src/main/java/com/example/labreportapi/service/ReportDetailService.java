@@ -4,7 +4,6 @@ import com.example.labreportapi.dao.ReportDetailRepository;
 import com.example.labreportapi.dao.ReportRepository;
 import com.example.labreportapi.entity.Report;
 import com.example.labreportapi.entity.ReportDetail;
-import com.example.labreportapi.response.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,19 +24,19 @@ public class ReportDetailService {
         this.reportRepository = reportRepository;
     }
 
-    public ResponseEntity<ApiResponse<ReportDetail>> findById(int id) {
+    public ResponseEntity<ReportDetail> findById(int id) {
         Optional<ReportDetail> optionalReportDetail = reportDetailRepository.findByReportId(id);
         if (optionalReportDetail.isPresent()) {
             ReportDetail reportDetail = optionalReportDetail.get();
-            return ApiResponse.build(HttpStatus.OK, "Report detail found successfully", reportDetail);
+            return ResponseEntity.ok(reportDetail);
         } else {
             throw new EntityNotFoundException("Report detail not found with report id: " + id);
         }
     }
 
-    public ResponseEntity<ApiResponse<ReportDetail>> add(ReportDetail reportDetail, int id) {
+    public ResponseEntity<?> add(ReportDetail reportDetail, int id) {
         if (reportDetail == null) {
-            return ApiResponse.build(HttpStatus.BAD_REQUEST, "Report detail cannot be null");
+            return ResponseEntity.badRequest().body("Report detail cannot be null");
         }
 
         Optional<Report> optionalReport = reportRepository.findById(id);
@@ -47,12 +46,12 @@ public class ReportDetailService {
         }
 
         reportDetailRepository.save(reportDetail);
-        return ApiResponse.build(HttpStatus.CREATED, "The report detail successfully created", reportDetail);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reportDetail);
     }
 
-    public ResponseEntity<ApiResponse<ReportDetail>> update(ReportDetail updatedReportDetail, int id) {
+    public ResponseEntity<?> update(ReportDetail updatedReportDetail, int id) {
         if (updatedReportDetail == null) {
-            return ApiResponse.build(HttpStatus.BAD_REQUEST, "Report detail cannot be null");
+            return ResponseEntity.badRequest().body("Report detail cannot be null");
         }
 
         Optional<ReportDetail> optionalReportDetail = reportDetailRepository.findByReportId(id);
@@ -67,21 +66,21 @@ public class ReportDetailService {
             }
 
             updatedReportDetail = reportDetailRepository.save(existingReportDetail);
-            return ApiResponse.build(HttpStatus.OK, "Report detail updated with id: " + id, updatedReportDetail);
+            return ResponseEntity.ok(updatedReportDetail);
         } else {
-            return ApiResponse.build(HttpStatus.NOT_FOUND, "Report detail not found with id: " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Report detail not found with id: " + id);
         }
     }
 
-    public ResponseEntity<ApiResponse<ReportDetail>> delete(int id) {
+    public ResponseEntity<String> delete(int id) {
         Optional<ReportDetail> optionalReportDetail = reportDetailRepository.findByReportId(id);
         if (optionalReportDetail.isPresent()) {
             ReportDetail existingReportDetail = optionalReportDetail.get();
             existingReportDetail.getReport().setReportDetail(null);
             reportDetailRepository.delete(existingReportDetail);
-            return ApiResponse.build(HttpStatus.OK, "Report detail with id " + id + " deleted successfully");
+            return ResponseEntity.ok("Report detail with id " + id + " deleted successfully");
         }
-        return ApiResponse.build(HttpStatus.NOT_FOUND, "Report detail not found with report id: " + id);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Report detail not found with report id: " + id);
     }
 
 }

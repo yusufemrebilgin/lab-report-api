@@ -4,7 +4,6 @@ import com.example.labreportapi.dao.PatientDetailRepository;
 import com.example.labreportapi.dao.PatientRepository;
 import com.example.labreportapi.entity.Patient;
 import com.example.labreportapi.entity.PatientDetail;
-import com.example.labreportapi.response.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,18 +24,18 @@ public class PatientDetailService {
         this.patientRepository = patientRepository;
     }
 
-    public ResponseEntity<ApiResponse<PatientDetail>> findById(int id) {
+    public ResponseEntity<PatientDetail> findById(int id) {
         Optional<PatientDetail> optionalPatientDetail = patientDetailRepository.findById(id);
         if (optionalPatientDetail.isPresent()) {
             PatientDetail patientDetail = optionalPatientDetail.get();
-            return ApiResponse.build(HttpStatus.OK, "Patient detail found successfully", patientDetail);
+            return ResponseEntity.ok(patientDetail);
         } else {
             throw new EntityNotFoundException("Patient detail not found with id: " + id);
         }
     }
-    public ResponseEntity<ApiResponse<PatientDetail>> add(PatientDetail patientDetail, int id) {
+    public ResponseEntity<?> add(PatientDetail patientDetail, int id) {
         if (patientDetail == null || patientDetail.getIdentityNumber() == 0) {
-            return ApiResponse.build(HttpStatus.BAD_REQUEST, "Patient detail or identity number cannot be empty");
+            return ResponseEntity.badRequest().body("Patient detail or identity number cannot be empty");
         }
 
         Optional<Patient> optionalPatient = patientRepository.findById(id);
@@ -46,12 +45,12 @@ public class PatientDetailService {
         }
 
         patientDetailRepository.save(patientDetail);
-        return ApiResponse.build(HttpStatus.CREATED, "The patient detail created successfully", patientDetail);
+        return ResponseEntity.status(HttpStatus.CREATED).body(patientDetail);
     }
 
-    public ResponseEntity<ApiResponse<PatientDetail>> update(PatientDetail updatedPatientDetail, int id) {
+    public ResponseEntity<?> update(PatientDetail updatedPatientDetail, int id) {
         if (updatedPatientDetail == null) {
-            return ApiResponse.build(HttpStatus.BAD_REQUEST, "Patient detail cannot be null");
+            return ResponseEntity.badRequest().body("Patient detail cannot be null");
         }
 
         Optional<PatientDetail> optionalPatientDetail = patientDetailRepository.findById(id);
@@ -64,20 +63,20 @@ public class PatientDetailService {
             }
 
             updatedPatientDetail = patientDetailRepository.save(existingPatientDetail);
-            return ApiResponse.build(HttpStatus.OK, "Patient detail updated with id: " + id, updatedPatientDetail);
+            return ResponseEntity.ok(updatedPatientDetail);
         } else {
-            return ApiResponse.build(HttpStatus.NOT_FOUND, "Patient detail not found with id: " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Patient detail not found with id: " + id);
         }
     }
-    public ResponseEntity<ApiResponse<Void>> delete(int id) {
+    public ResponseEntity<String> delete(int id) {
         Optional<PatientDetail> optionalPatientDetail = patientDetailRepository.findById(id);
         if (optionalPatientDetail.isPresent()) {
             PatientDetail existingPatientDetail = optionalPatientDetail.get();
             existingPatientDetail.getPatient().setPatientDetail(null);
             patientDetailRepository.delete(existingPatientDetail);
-            return ApiResponse.build(HttpStatus.OK, "Patient detail with id " + id + " successfully deleted");
+            return ResponseEntity.ok("Patient detail with id " + id + " successfully deleted");
         }
-        return ApiResponse.build(HttpStatus.NOT_FOUND, "Patient detail not found with id: " + id);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Patient detail not found with id: " + id);
     }
 
 }
