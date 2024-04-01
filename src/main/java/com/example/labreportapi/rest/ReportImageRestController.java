@@ -1,7 +1,5 @@
 package com.example.labreportapi.rest;
 
-import com.example.labreportapi.entity.ReportImage;
-import com.example.labreportapi.response.ApiResponse;
 import com.example.labreportapi.service.ReportImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

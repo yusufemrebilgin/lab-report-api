@@ -1,7 +1,6 @@
 package com.example.labreportapi.rest;
 
 import com.example.labreportapi.entity.Patient;
-import com.example.labreportapi.response.ApiResponse;
 import com.example.labreportapi.service.PatientService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,31 +22,46 @@ public class PatientRestController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Patient>>> getAllPatients() {
+    public ResponseEntity<List<Patient>> getAllPatients() {
         return patientService.findAll();
     }
 
+    @GetMapping("/asc")
+    public ResponseEntity<?> getAllPatientsByOrderFullName() {
+        return patientService.findAllByOrderFullNameAsc();
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Patient>> getPatientById(@PathVariable int id) {
+    public ResponseEntity<?> getPatientById(@PathVariable int id) {
         try {
             return patientService.findById(id);
         } catch (EntityNotFoundException e) {
-            return ApiResponse.build(HttpStatus.NOT_FOUND, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> getPatientByFullName(@RequestParam String firstName, @RequestParam String lastName) {
+        return patientService.findByFirstNameAndLastName(firstName, lastName);
+    }
+
+    @GetMapping("/search/{identityNumber}")
+    public ResponseEntity<?> getPatientByIdentityNumber(@PathVariable long identityNumber) {
+        return patientService.findByIdentityNumber(identityNumber);
+    }
+
     @PostMapping
-    public ResponseEntity<ApiResponse<Patient>> addPatient(@RequestBody Patient patient) {
+    public ResponseEntity<?> addPatient(@RequestBody Patient patient) {
         return patientService.add(patient);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Patient>> updatePatient(@RequestBody Patient patient, @PathVariable int id) {
+    public ResponseEntity<?> updatePatient(@RequestBody Patient patient, @PathVariable int id) {
         return patientService.update(patient, id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deletePatient(@PathVariable int id) {
+    public ResponseEntity<String> deletePatient(@PathVariable int id) {
         return patientService.delete(id);
     }
 

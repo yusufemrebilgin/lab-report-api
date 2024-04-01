@@ -1,7 +1,6 @@
 package com.example.labreportapi.rest;
 
 import com.example.labreportapi.entity.ReportDetail;
-import com.example.labreportapi.response.ApiResponse;
 import com.example.labreportapi.service.ReportDetailService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,26 +21,26 @@ public class ReportDetailRestController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<ReportDetail>> getReportDetailById(@PathVariable("reportId") int id) {
+    public ResponseEntity<?> getReportDetailById(@PathVariable("reportId") int id) {
         try {
             return reportDetailService.findById(id);
         } catch (EntityNotFoundException e) {
-            return ApiResponse.build(HttpStatus.NOT_FOUND, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ReportDetail>> addReportDetail(@RequestBody ReportDetail detail, @PathVariable("reportId") int id) {
+    public ResponseEntity<?> addReportDetail(@RequestBody ReportDetail detail, @PathVariable("reportId") int id) {
         return reportDetailService.add(detail, id);
     }
 
     @PutMapping
-    public ResponseEntity<ApiResponse<ReportDetail>> updateReportDetail(@RequestBody ReportDetail detail, @PathVariable("reportId") int id) {
+    public ResponseEntity<?> updateReportDetail(@RequestBody ReportDetail detail, @PathVariable("reportId") int id) {
         return reportDetailService.update(detail, id);
     }
 
     @DeleteMapping
-    public ResponseEntity<ApiResponse<ReportDetail>> deleteReportDetail(@PathVariable("reportId") int id) {
+    public ResponseEntity<String> deleteReportDetail(@PathVariable("reportId") int id) {
         return reportDetailService.delete(id);
     }
 

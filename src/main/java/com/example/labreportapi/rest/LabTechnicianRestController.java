@@ -1,7 +1,6 @@
 package com.example.labreportapi.rest;
 
 import com.example.labreportapi.entity.LabTechnician;
-import com.example.labreportapi.response.ApiResponse;
 import com.example.labreportapi.service.LabTechnicianService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,31 +22,41 @@ public class LabTechnicianRestController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<LabTechnician>>> getAllLabTechnicians() {
+    public ResponseEntity<List<LabTechnician>> getAllLabTechnicians() {
         return labTechnicianService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<LabTechnician>> getLabTechnicianById(@PathVariable int id) {
+    public ResponseEntity<?> getLabTechnicianById(@PathVariable int id) {
         try {
             return labTechnicianService.findById(id);
         } catch (EntityNotFoundException e) {
-            return ApiResponse.build(HttpStatus.NOT_FOUND, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> getLabTechnicianByFullName(@RequestParam String firstName, @RequestParam String lastName) {
+        return labTechnicianService.findByFirstNameAndLastName(firstName, lastName);
+    }
+
+    @GetMapping("/search/{hospitalId}")
+    public ResponseEntity<?> getLabTechnicianByHospitalId(@PathVariable int hospitalId) {
+        return labTechnicianService.findByHospitalId(hospitalId);
+    }
+
     @PostMapping
-    public ResponseEntity<ApiResponse<LabTechnician>> addLabTechnician(@RequestBody LabTechnician labTechnician) {
+    public ResponseEntity<?> addLabTechnician(@RequestBody LabTechnician labTechnician) {
         return labTechnicianService.add(labTechnician);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<LabTechnician>> updateLabTechnician(@RequestBody LabTechnician labTechnician, @PathVariable int id) {
+    public ResponseEntity<?> updateLabTechnician(@RequestBody LabTechnician labTechnician, @PathVariable int id) {
         return labTechnicianService.update(labTechnician, id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteLabTechnician(@PathVariable int id) {
+    public ResponseEntity<String> deleteLabTechnician(@PathVariable int id) {
         return labTechnicianService.delete(id);
     }
 
