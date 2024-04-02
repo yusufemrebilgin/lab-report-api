@@ -74,9 +74,7 @@ It provides endpoints for managing lab reports.
         "reportImage": null
       }
     }
-    ```
-    
-    - [Click here for more endpoints](#endpoints)
+    ```  
 
 ## ERD
 
