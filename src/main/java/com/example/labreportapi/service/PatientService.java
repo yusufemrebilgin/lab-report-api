@@ -69,7 +69,6 @@ public class PatientService {
         if (patient == null || patient.getFirstName() == null || patient.getLastName() == null) {
             return ResponseEntity.badRequest().body("Provided fields cannot be null");
         }
-
         PatientDetail patientDetail = patient.getPatientDetail();
         List<Report> reports = patient.getReports();
 
@@ -80,8 +79,7 @@ public class PatientService {
             reports.forEach(r -> r.setPatient(patient));
         }
 
-        patientRepository.save(patient);
-        return ResponseEntity.status(HttpStatus.CREATED).body(patient);
+        return ResponseEntity.status(HttpStatus.CREATED).body(patientRepository.save(patient));
     }
 
     public ResponseEntity<?> update(Patient updatedPatient, int id) {

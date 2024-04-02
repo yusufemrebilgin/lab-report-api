@@ -44,8 +44,7 @@ public class PatientDetailService {
             patient.setPatientDetail(patientDetail);
         }
 
-        patientDetailRepository.save(patientDetail);
-        return ResponseEntity.status(HttpStatus.CREATED).body(patientDetail);
+        return ResponseEntity.status(HttpStatus.CREATED).body(patientDetailRepository.save(patientDetail));
     }
 
     public ResponseEntity<?> update(PatientDetail updatedPatientDetail, int id) {

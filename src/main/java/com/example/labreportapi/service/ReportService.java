@@ -64,8 +64,7 @@ public class ReportService {
             reportDetail.setReport(report);
         }
 
-        reportRepository.save(report);
-        return ResponseEntity.status(HttpStatus.CREATED).body(report);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reportRepository.save(report));
     }
 
     public ResponseEntity<?> update(Report updatedReport, int id) {

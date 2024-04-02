@@ -47,8 +47,7 @@ public class ReportImageService {
                 }
                 reportDetail.setReportImage(uploadedImage);
                 report.setReportDetail(reportDetail);
-                reportImageRepository.save(uploadedImage);
-                return ResponseEntity.ok(uploadedImage);
+                return ResponseEntity.ok(reportImageRepository.save(uploadedImage));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There is no image for report: " + reportId);
             }

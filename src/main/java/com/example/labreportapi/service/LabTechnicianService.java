@@ -69,8 +69,7 @@ public class LabTechnicianService {
             reports.forEach(report -> report.setLabTechnician(labTechnician));
         }
 
-        labTechnicianRepository.save(labTechnician);
-        return ResponseEntity.status(HttpStatus.CREATED).body(labTechnician);
+        return ResponseEntity.status(HttpStatus.CREATED).body(labTechnicianRepository.save(labTechnician));
     }
 
     public ResponseEntity<?> update(LabTechnician updatedTechnician, int id) {
