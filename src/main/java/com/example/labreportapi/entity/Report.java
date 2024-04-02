@@ -25,7 +25,6 @@ public class Report extends BaseEntity {
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "patient_id")
-    @JsonManagedReference
     private Patient patient;
 
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE,

@@ -1,6 +1,8 @@
 package com.example.labreportapi.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +31,7 @@ public class Patient extends BaseEntity {
 
     @OneToMany(mappedBy = "patient", cascade = {CascadeType.DETACH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.REFRESH})
-    @JsonBackReference
+    @JsonIgnore
     private List<Report> reports;
 
 }
