@@ -126,8 +126,8 @@ It provides endpoints for managing lab reports.
 | GET         | /api/patients                 | Retrieve all patients                                      |
 | GET         | /api/patients/{id}            | Retrieve a specific patient by its ID                      |
 | GET         | /api/patients/asc             | Retrieve all patients in ascending order by full names     |
-| GET         | /api/patient/search           | Search for patients by first name and last name parameters |
-| GET         | /api/patient/{identityNumber} | Search for patients by identity number                     |
+| GET         | /api/patients/search           | Search for patients by first name and last name parameters |
+| GET         | /api/patients/{identityNumber} | Search for patients by identity number                     |
 | POST        | /api/patients                 | Create a new patient                                       |
 | PUT         | /api/patients/{id}            | Update an existing patient                                 |
 | DELETE      | /api/patients/{id}            | Delete a specific patient by its ID                        |
@@ -149,6 +149,6 @@ It provides endpoints for managing lab reports.
 | GET         | /api/lab/{id}                | Retrieve a specific lab technician by its ID                  |
 | GET         | /api/lab/search              | Search for technicians by first name and last name parameters |
 | GET         | /api/lab/search/{hospitalId} | Search for technicians by hospital ID                         |
-| POST        | /api/lab/                    | Create a new lab technician                                   |
+| POST        | /api/lab                     | Create a new lab technician                                   |
 | PUT         | /api/lab/{id}                | Update an existing lab technician                             |
 | DELETE      | /api/lab/{id}                | Delete a specific lab technician by its ID                    |
