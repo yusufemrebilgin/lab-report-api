@@ -35,7 +35,7 @@ It provides endpoints for managing lab reports.
     ./mvnw spring-boot:run
     ```
 
-7.  Once the app is running, you can test the API using tools like **Postman**. Here are **_some endpoints and their samples:_**
+7.  Once the app is running, you can test the API using tools like **Postman**.
 
 ## Sample Requests
 
