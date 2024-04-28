@@ -1,125 +1,113 @@
 package com.example.labreportapi.service;
 
+import com.example.labreportapi.dao.PatientDetailRepository;
 import com.example.labreportapi.dao.PatientRepository;
 import com.example.labreportapi.entity.Patient;
 import com.example.labreportapi.entity.PatientDetail;
-import com.example.labreportapi.entity.Report;
-import jakarta.persistence.EntityNotFoundException;
+import com.example.labreportapi.exception.PatientDetailNotFoundException;
+import com.example.labreportapi.exception.PatientNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PatientService {
 
     private final PatientRepository patientRepository;
+    private final PatientDetailRepository patientDetailRepository;
 
     @Autowired
-    public PatientService(PatientRepository patientRepository) {
+    public PatientService(PatientRepository patientRepository, PatientDetailRepository patientDetailRepository) {
         this.patientRepository = patientRepository;
+        this.patientDetailRepository = patientDetailRepository;
     }
 
-    public ResponseEntity<List<Patient>> findAll() {
-        List<Patient> patients = patientRepository.findAll();
-        if (patients.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(patients);
+    public List<Patient> getAllPatients() {
+        return patientRepository.findAll();
     }
 
-    public ResponseEntity<List<Patient>> findAllByOrderFullNameAsc() {
-        List<Patient> patients = patientRepository.findAllByOrderByFirstNameAscLastNameAsc();
-        if (patients.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(patients);
+    public Patient getPatientById(int id) {
+        return patientRepository.findById(id)
+                .orElseThrow(() -> new PatientNotFoundException(id));
     }
 
-    public ResponseEntity<Patient> findById(int id) {
-        Optional<Patient> optionalPatient = patientRepository.findById(id);
-        if (optionalPatient.isPresent()) {
-            Patient patient = optionalPatient.get();
-            return ResponseEntity.ok(patient);
-        } else {
-            throw new EntityNotFoundException("Patient not found with id: " + id);
-        }
+    public List<Patient> getAllPatientsByOrderFullNameAsc() {
+        return patientRepository.findAllByOrderByFirstNameAscLastNameAsc();
     }
 
-    public ResponseEntity<?> findByFirstNameAndLastName(String firstName, String lastName) {
-        Optional<Patient> optionalPatient = patientRepository.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(firstName, lastName);
-        if (optionalPatient.isPresent()) {
-            return ResponseEntity.ok(optionalPatient.get());
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Patient not found: " + firstName + " " + lastName);
+    public List<Patient> getAllPatientsByFirstNameStartsWith(String prefix) {
+        return patientRepository.findByFirstNameIgnoreCaseStartingWith(prefix);
     }
 
-    public ResponseEntity<?> findByIdentityNumber(long identityNumber) {
-        Patient patient = patientRepository.findByPatientDetailIdentityNumber(identityNumber);
-        if (patient == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Patient not found");
-        }
-        return ResponseEntity.ok(patient);
+    public Patient addPatient(Patient patient) {
+        return patientRepository.save(patient);
     }
 
-    public ResponseEntity<?> add(Patient patient) {
-        if (patient == null || patient.getFirstName() == null || patient.getLastName() == null) {
-            return ResponseEntity.badRequest().body("Provided fields cannot be null");
-        }
+    public Patient updatePatient(Patient newPatient, int id) {
+        return patientRepository.findById(id)
+                .map(patient -> {
+                    patient.setFirstName(newPatient.getFirstName());
+                    patient.setLastName(newPatient.getLastName());
+                    if (newPatient.getPatientDetail() != null)
+                        patient.setPatientDetail(newPatient.getPatientDetail());
+                    if (newPatient.getReports() != null)
+                        patient.setReports(newPatient.getReports());
+                    return patientRepository.save(patient);
+                }).orElseGet(() -> {
+                    newPatient.setId(id);
+                    return patientRepository.save(newPatient);
+                });
+    }
+
+    public void deletePatient(int id) {
+        Patient existingPatient = patientRepository.findById(id).orElseThrow(() -> new PatientNotFoundException(id));
+        patientRepository.delete(existingPatient);
+    }
+
+    public PatientDetail getPatientDetailByPatientId(int id) {
+        Patient patient = patientRepository.findById(id).orElseThrow(() -> new PatientNotFoundException(id));
         PatientDetail patientDetail = patient.getPatientDetail();
-        List<Report> reports = patient.getReports();
-
-        if (patientDetail != null) {
-            patientDetail.setPatient(patient);
+        if (patientDetail == null) {
+            throw new PatientDetailNotFoundException(id);
         }
-        if (reports != null) {
-            reports.forEach(r -> r.setPatient(patient));
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(patientRepository.save(patient));
+        return patientDetail;
     }
 
-    public ResponseEntity<?> update(Patient updatedPatient, int id) {
-        if (updatedPatient == null) {
-            return ResponseEntity.badRequest().body("Patient cannot be null");
-        }
+    public PatientDetail addPatientDetail(PatientDetail patientDetail, int id) {
+        Patient patient = patientRepository.findById(id).orElseThrow(() -> new PatientNotFoundException(id));
+        patient.setPatientDetail(patientDetail);
+        return patientDetailRepository.save(patientDetail);
+    }
 
-        Optional<Patient> optionalPatient = patientRepository.findById(id);
-        if (optionalPatient.isPresent()) {
-            Patient existingPatient = optionalPatient.get();
-            List<Report> updatedReportList = updatedPatient.getReports();
-            existingPatient.setFirstName(updatedPatient.getFirstName());
-            existingPatient.setLastName(updatedPatient.getLastName());
+    public PatientDetail updatePatientDetail(PatientDetail newPatientDetail, int id) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new PatientNotFoundException(id));
 
-            if (updatedReportList != null && !updatedReportList.isEmpty()) {
-                existingPatient.setReports(updatedReportList);
-            }
-            if (updatedPatient.getPatientDetail() != null) {
-                existingPatient.setPatientDetail(updatedPatient.getPatientDetail());
-            }
-
-            updatedPatient = patientRepository.save(existingPatient);
-            return ResponseEntity.ok(updatedPatient);
+        PatientDetail savedDetail = patient.getPatientDetail();
+        if (savedDetail != null) {
+            if (newPatientDetail.getIdentityNumber() != 0L)
+                savedDetail.setIdentityNumber(newPatientDetail.getIdentityNumber());
+            if (newPatientDetail.getEmail() != null)
+                savedDetail.setEmail(newPatientDetail.getEmail());
+            if (newPatientDetail.getPhoneNumber() != null)
+                savedDetail.setPhoneNumber(newPatientDetail.getPhoneNumber());
+            return patientDetailRepository.save(savedDetail);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Patient not found with id: " + id);
+            patient.setPatientDetail(newPatientDetail);
+            return patientDetailRepository.save(newPatientDetail);
         }
     }
 
-    public ResponseEntity<String> delete(int id) {
-        Optional<Patient> optionalPatient = patientRepository.findById(id);
-        if (optionalPatient.isPresent()) {
-            Patient existingPatient = optionalPatient.get();
-            List<Report> reports = existingPatient.getReports();
-            if (reports != null) {
-                reports.forEach(r -> r.setPatient(null));
-            }
-            patientRepository.delete(existingPatient);
-            return ResponseEntity.ok("Patient with id " + id + " deleted successfully");
+    public void deletePatientDetail(int id) {
+        Patient existingPatient = patientRepository.findById(id)
+                .orElseThrow(() -> new PatientNotFoundException(id));
+        PatientDetail existingDetail = existingPatient.getPatientDetail();
+        if (existingDetail == null) {
+            throw new PatientDetailNotFoundException(id);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Patient not found with id: " + id);
+        existingPatient.setPatientDetail(null);
+        patientDetailRepository.delete(existingDetail);
     }
 
 }

@@ -2,16 +2,15 @@ package com.example.labreportapi.rest;
 
 import com.example.labreportapi.entity.LabTechnician;
 import com.example.labreportapi.service.LabTechnicianService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import static com.example.labreportapi.util.URIBuilder.*;
 
 @RestController
-@RequestMapping("/api/lab")
+@RequestMapping("/api/techs")
 public class LabTechnicianRestController {
 
     private final LabTechnicianService labTechnicianService;
@@ -23,41 +22,41 @@ public class LabTechnicianRestController {
 
     @GetMapping
     public ResponseEntity<List<LabTechnician>> getAllLabTechnicians() {
-        return labTechnicianService.findAll();
+        List<LabTechnician> technicians = labTechnicianService.getAll();
+        return technicians.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(technicians);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getLabTechnicianById(@PathVariable int id) {
-        try {
-            return labTechnicianService.findById(id);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        return ResponseEntity.ok(labTechnicianService.getById(id));
     }
 
     @GetMapping("/search")
     public ResponseEntity<?> getLabTechnicianByFullName(@RequestParam String firstName, @RequestParam String lastName) {
-        return labTechnicianService.findByFirstNameAndLastName(firstName, lastName);
+        return ResponseEntity.ok(labTechnicianService.getByFirstNameAndLastName(firstName, lastName));
     }
 
     @GetMapping("/search/{hospitalId}")
     public ResponseEntity<?> getLabTechnicianByHospitalId(@PathVariable int hospitalId) {
-        return labTechnicianService.findByHospitalId(hospitalId);
+        return ResponseEntity.ok(labTechnicianService.getByHospitalId(hospitalId));
     }
 
     @PostMapping
     public ResponseEntity<?> addLabTechnician(@RequestBody LabTechnician labTechnician) {
-        return labTechnicianService.add(labTechnician);
+        labTechnician = labTechnicianService.add(labTechnician);
+        return ResponseEntity.created(getResourceLocation(labTechnician.getId())).body(labTechnician);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateLabTechnician(@RequestBody LabTechnician labTechnician, @PathVariable int id) {
-        return labTechnicianService.update(labTechnician, id);
+        LabTechnician updated =  labTechnicianService.update(labTechnician, id);
+        return ResponseEntity.created(getResourceLocation()).body(updated);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteLabTechnician(@PathVariable int id) {
-        return labTechnicianService.delete(id);
+        labTechnicianService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

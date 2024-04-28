@@ -5,20 +5,22 @@ import com.example.labreportapi.dao.ReportRepository;
 import com.example.labreportapi.entity.Report;
 import com.example.labreportapi.entity.ReportDetail;
 import com.example.labreportapi.entity.ReportImage;
+import com.example.labreportapi.exception.ReportImageNotFoundException;
+import com.example.labreportapi.exception.ReportNotFoundException;
 import com.example.labreportapi.util.ImageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.Optional;
 import java.util.zip.DataFormatException;
 
-@Service
 @Slf4j
+@Service
 public class ReportImageService {
 
     private final ReportImageRepository reportImageRepository;
@@ -30,7 +32,7 @@ public class ReportImageService {
         this.reportRepository = reportRepository;
     }
 
-    public ResponseEntity<?> uploadImage(MultipartFile file, int reportId) {
+    public ReportImage uploadImage(MultipartFile file, int reportId) {
         try {
             ReportImage uploadedImage = ReportImage.builder()
                     .name(file.getOriginalFilename())
@@ -38,47 +40,41 @@ public class ReportImageService {
                     .imageData(ImageUtil.compressImage(file.getBytes()))
                     .build();
 
-            Optional<Report> optionalReport = reportRepository.findById(reportId);
-            if (optionalReport.isPresent()) {
-                Report report = optionalReport.get();
-                ReportDetail reportDetail = report.getReportDetail();
-                if (reportDetail == null) {
-                    reportDetail = new ReportDetail();
-                }
-                reportDetail.setReportImage(uploadedImage);
-                report.setReportDetail(reportDetail);
-                return ResponseEntity.ok(reportImageRepository.save(uploadedImage));
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There is no image for report: " + reportId);
+            Report report = reportRepository.findById(reportId)
+                    .orElseThrow(() -> new ReportNotFoundException(reportId));
+
+            ReportDetail reportDetail = report.getReportDetail();
+            if (reportDetail == null) {
+                reportDetail = new ReportDetail();
             }
+
+            report.setReportDetail(reportDetail);
+            reportDetail.setReportImage(uploadedImage);
+            return reportImageRepository.save(uploadedImage);
         } catch (IOException e) {
             log.error("Failed to upload image", e);
-            return ResponseEntity.internalServerError().body("Failed to upload image");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload image");
         }
     }
 
     public byte[] getImageDataByReportId(int reportId) {
-        Optional<ReportImage> optionalReportImage = reportImageRepository.findByReportDetailReportId(reportId);
-        if (optionalReportImage.isPresent()) {
-            try {
-                return ImageUtil.decompressImage(optionalReportImage.get().getImageData());
-            } catch (IOException | DataFormatException e) {
-                log.error("Failed to decompress image", e);
-            }
+       ReportImage reportImage = reportImageRepository.findByReportDetailReportId(reportId)
+                .orElseThrow(() -> new ReportImageNotFoundException(reportId));
+        try {
+            return ImageUtil.decompressImage(reportImage.getImageData());
+        } catch (IOException | DataFormatException e) {
+            log.error("Failed to decompress image", e);
         }
         return null;
     }
 
-    public ResponseEntity<String> deleteImage(int reportId) {
+    public void deleteImage(int reportId) {
         Optional<ReportImage> optionalReportImage = reportImageRepository.findByReportDetailReportId(reportId);
-        if (optionalReportImage.isPresent()) {
-            ReportImage existingImage = optionalReportImage.get();
-            existingImage.getReportDetail().setReportImage(null);
-            reportImageRepository.delete(existingImage);
-            return ResponseEntity.ok("Report image deleted successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Report image not found with id: " + reportId);
-        }
+        ReportImage existingReportImage = reportImageRepository.findByReportDetailReportId(reportId)
+                .orElseThrow(() -> new ReportImageNotFoundException(reportId));
+        ReportDetail reportDetail = existingReportImage.getReportDetail();
+        reportDetail.setReportImage(null);
+        reportImageRepository.delete(existingReportImage);
     }
 
 }

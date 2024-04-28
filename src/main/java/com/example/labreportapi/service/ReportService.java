@@ -1,119 +1,107 @@
 package com.example.labreportapi.service;
 
+import com.example.labreportapi.dao.ReportDetailRepository;
 import com.example.labreportapi.dao.ReportRepository;
-import com.example.labreportapi.entity.LabTechnician;
-import com.example.labreportapi.entity.Patient;
 import com.example.labreportapi.entity.Report;
 import com.example.labreportapi.entity.ReportDetail;
-import jakarta.persistence.EntityNotFoundException;
+import com.example.labreportapi.exception.ReportDetailNotFoundException;
+import com.example.labreportapi.exception.ReportNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ReportService {
 
     private final ReportRepository reportRepository;
+    private final ReportDetailRepository reportDetailRepository;
 
     @Autowired
-    public ReportService(ReportRepository reportRepository) {
+    public ReportService(ReportRepository reportRepository, ReportDetailRepository reportDetailRepository) {
         this.reportRepository = reportRepository;
+        this.reportDetailRepository = reportDetailRepository;
     }
 
-    public ResponseEntity<List<Report>> findAll() {
-        List<Report> reports = reportRepository.findAll();
-        if (reports.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    public List<Report> getAll() {
+        return reportRepository.findAll();
+    }
+
+    public Report getReportById(int id) {
+        return reportRepository.findById(id).orElseThrow(() -> new ReportNotFoundException(id));
+    }
+
+    public List<Report> getAllReportsByReportDateOrder(boolean ascending) {
+        return ascending ? reportRepository.findAllByOrderByReportDetailReportDateAsc()
+                         : reportRepository.findAllByOrderByReportDetailReportDateDesc();
+    }
+
+    public Report addReport(Report report) {
+        return reportRepository.save(report);
+    }
+
+    public Report updateReport(Report newReport, int id) {
+        return reportRepository.findById(id)
+                .map(report -> {
+                    if (newReport.getReportCode() != null && !newReport.getReportCode().equals(report.getReportCode()))
+                        report.setReportCode(newReport.getReportCode());
+                    if (newReport.getDiagnosisTitle() != null)
+                        report.setDiagnosisTitle(newReport.getDiagnosisTitle());
+                    if (newReport.getPatient() != null)
+                        report.setPatient(newReport.getPatient());
+                    if (newReport.getLabTechnician() != null)
+                        report.setLabTechnician(newReport.getLabTechnician());
+                    if (newReport.getReportDetail() != null)
+                        report.setReportDetail(newReport.getReportDetail());
+                    return reportRepository.save(report);
+                }).orElseThrow(() -> new ReportNotFoundException(id));
+    }
+
+    public void deleteReport(int id) {
+        Report existingReport = getReportById(id);
+        existingReport.setPatient(null);
+        existingReport.setLabTechnician(null);
+        reportRepository.delete(existingReport);
+    }
+
+    public ReportDetail getReportDetailById(int id) {
+        Report existingReport = getReportById(id);
+        ReportDetail existingDetail = existingReport.getReportDetail();
+        if (existingDetail == null) {
+            throw new ReportDetailNotFoundException(id);
         }
-        return ResponseEntity.ok(reports);
+        return existingDetail;
     }
 
-    public ResponseEntity<List<Report>> findAllByOrderByReportDateAsc() {
-        List<Report> reports = reportRepository.findAllByOrderByReportDetailReportDateAsc();
-        if (reports.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(reports);
+    public ReportDetail addReportDetail(ReportDetail reportDetail, int id) {
+        Report report = getReportById(id);
+        report.setReportDetail(reportDetail);
+        return reportDetailRepository.save(reportDetail);
     }
 
-    public ResponseEntity<Report> findById(int id) {
-        Optional<Report> optionalReport = reportRepository.findById(id);
-        if (optionalReport.isPresent()) {
-            Report report = optionalReport.get();
-            return ResponseEntity.ok(report);
+    public ReportDetail updateReportDetail(ReportDetail newReportDetail, int id) {
+        Report report = getReportById(id);
+        ReportDetail savedDetail = report.getReportDetail();
+        if (savedDetail != null) {
+            if (newReportDetail.getDiagnosisDetails() != null)
+                savedDetail.setDiagnosisDetails(newReportDetail.getDiagnosisDetails());
+            if (newReportDetail.getReportDate() != null)
+                savedDetail.setReportDate(newReportDetail.getReportDate());
+            return reportDetailRepository.save(savedDetail);
         } else {
-            throw new EntityNotFoundException("Report not found with id: " + id);
+            report.setReportDetail(newReportDetail);
+            return reportDetailRepository.save(newReportDetail);
         }
     }
 
-    public ResponseEntity<?> add(Report report) {
-        if (report == null || report.getReportCode() == null || report.getDiagnosisTitle() == null) {
-            return ResponseEntity.badRequest().body("Provided fields cannot be null");
+    public void deleteReportDetail(int id) {
+        Report existingReport = getReportById(id);
+        ReportDetail existingDetail = existingReport.getReportDetail();
+        if (existingDetail == null) {
+            throw new ReportDetailNotFoundException(id);
         }
-
-        if (reportRepository.existsByReportCode(report.getReportCode())) {
-            return ResponseEntity.badRequest().body("Report code already exists");
-        }
-
-        ReportDetail reportDetail = report.getReportDetail();
-        if (reportDetail != null) {
-            reportDetail.setReport(report);
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(reportRepository.save(report));
-    }
-
-    public ResponseEntity<?> update(Report updatedReport, int id) {
-        if (updatedReport == null) {
-            return ResponseEntity.badRequest().body("Report cannot be null");
-        }
-
-        Optional<Report> optionalReport = reportRepository.findById(id);
-        if (optionalReport.isPresent()) {
-            Report existingReport = optionalReport.get();
-
-            if (updatedReport.getReportCode() != null
-            && !reportRepository.existsByReportCode(updatedReport.getReportCode())) {
-                existingReport.setReportCode(updatedReport.getReportCode());
-            }
-
-            existingReport.setDiagnosisTitle(updatedReport.getDiagnosisTitle());
-            existingReport.setPatient(updatedReport.getPatient());
-            existingReport.setLabTechnician(updatedReport.getLabTechnician());
-
-            if (updatedReport.getReportDetail() != null) {
-                existingReport.setReportDetail(updatedReport.getReportDetail());
-            }
-
-            updatedReport = reportRepository.save(existingReport);
-            return ResponseEntity.ok(updatedReport);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Report not found with id: " + id);
-        }
-    }
-
-    public ResponseEntity<String> delete(int id) {
-        Optional<Report> optionalReport = reportRepository.findById(id);
-        if (optionalReport.isPresent()) {
-            Report report = optionalReport.get();
-            Patient patient = report.getPatient();
-            LabTechnician labTechnician = report.getLabTechnician();
-
-            if (patient != null) {
-                patient.getReports().remove(report);
-            }
-            if (labTechnician != null) {
-                labTechnician.getReports().remove(report);
-            }
-
-            reportRepository.delete(report);
-            return ResponseEntity.ok("Report with id " + id + " deleted successfully");
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Report not found with id: " + id);
+        existingReport.setReportDetail(null);
+        reportDetailRepository.delete(existingDetail);
     }
 
 }

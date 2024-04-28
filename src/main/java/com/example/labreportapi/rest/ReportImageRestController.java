@@ -1,13 +1,16 @@
 package com.example.labreportapi.rest;
 
+import com.example.labreportapi.entity.ReportImage;
 import com.example.labreportapi.service.ReportImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import static com.example.labreportapi.util.URIBuilder.getResourceLocation;
+
 @RestController
-@RequestMapping("/api/reports/{reportId}/details/image")
+@RequestMapping("/api/reports/{id}/details/image")
 public class ReportImageRestController {
 
     private final ReportImageService reportImageService;
@@ -18,22 +21,21 @@ public class ReportImageRestController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getReportImage(@PathVariable("reportId") int id) {
+    public ResponseEntity<?> getReportImage(@PathVariable int id) {
         byte[] imageData = reportImageService.getImageDataByReportId(id);
-        if (imageData != null) {
-            return ResponseEntity.ok(imageData);
-        }
-        return ResponseEntity.badRequest().build();
+        return imageData != null ? ResponseEntity.ok(imageData) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    public ResponseEntity<?> uploadReportImage(@RequestParam("image")MultipartFile file, @PathVariable("reportId") int id) {
-        return reportImageService.uploadImage(file, id);
+    public ResponseEntity<?> uploadReportImage(@RequestParam("image")MultipartFile file, @PathVariable int id) {
+        ReportImage reportImage = reportImageService.uploadImage(file, id);
+        return ResponseEntity.created(getResourceLocation()).body(reportImage);
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteReportImage(@PathVariable("reportId") int id) {
-        return reportImageService.deleteImage(id);
+    public ResponseEntity<?> deleteReportImage(@PathVariable int id) {
+        reportImageService.deleteImage(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
