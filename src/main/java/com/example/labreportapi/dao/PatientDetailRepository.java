@@ -5,6 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PatientDetailRepository extends JpaRepository<PatientDetail, Integer> {
 
-    boolean existsByIdentityNumber(long identityNumber);
-
 }

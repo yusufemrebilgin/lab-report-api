@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ReportRepository extends JpaRepository<Report, Integer> {
 
-    boolean existsByReportCode(String reportCode);
     List<Report> findAllByOrderByReportDetailReportDateAsc();
+    List<Report> findAllByOrderByReportDetailReportDateDesc();
 
 }

@@ -8,6 +8,6 @@ import java.util.Optional;
 public interface LabTechnicianRepository extends JpaRepository<LabTechnician, Integer> {
 
     Optional<LabTechnician> findByFirstNameIgnoreCaseAndLastNameIgnoreCase(String firstName, String lastName);
-    LabTechnician findByHospitalId(int hospitalId);
+    Optional<LabTechnician> findByHospitalId(int hospitalId);
 
 }
