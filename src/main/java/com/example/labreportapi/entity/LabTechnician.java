@@ -21,7 +21,7 @@ public class LabTechnician extends BaseEntity {
     @NotEmpty(message = "First name is mandatory")
     private String firstName;
 
-    @NotEmpty(message = "First name is mandatory")
+    @NotEmpty(message = "Last name is mandatory")
     private String lastName;
 
     @Column(name = "hospital_identity_number")
