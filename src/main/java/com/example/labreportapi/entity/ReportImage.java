@@ -18,7 +18,7 @@ public class ReportImage extends BaseEntity {
     private String type;
 
     @Lob
-    @Column(name = "image_data", columnDefinition = "BLOB")
+    @Column(columnDefinition = "BLOB")
     private byte[] imageData;
 
     @JsonIgnore

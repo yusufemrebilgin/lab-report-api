@@ -14,10 +14,8 @@ import java.sql.Date;
 @Table(name = "report_detail")
 public class ReportDetail extends BaseEntity {
 
-    @Column(name = "diagnosis_details")
     private String diagnosisDetails;
 
-    @Column(name = "report_date")
     private Date reportDate;
 
     @OneToOne(cascade = CascadeType.ALL)

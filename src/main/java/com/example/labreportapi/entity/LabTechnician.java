@@ -1,7 +1,8 @@
 package com.example.labreportapi.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,18 +18,18 @@ import java.util.List;
 @Table(name = "lab_technician")
 public class LabTechnician extends BaseEntity {
 
-    @Column(name = "first_name")
+    @NotEmpty(message = "First name is mandatory")
     private String firstName;
 
-    @Column(name = "last_name")
+    @NotEmpty(message = "First name is mandatory")
     private String lastName;
 
     @Column(name = "hospital_identity_number")
+    @Digits(integer = 7, fraction = 0)
     private int hospitalId;
 
     @OneToMany(mappedBy = "labTechnician", cascade = {CascadeType.DETACH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.REFRESH})
-    @JsonManagedReference
     private List<Report> reports;
 
 }
